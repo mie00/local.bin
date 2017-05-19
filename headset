@@ -1,0 +1,15 @@
+#!/bin/bash
+FIXED="1"
+while [ "$FIXED" != "0" ]; do
+	echo "power on" | bluetoothctl
+	sleep 1
+	echo "disconnect E4:22:A5:3D:D3:9C" | bluetoothctl
+	sleep 5
+	echo "connect E4:22:A5:3D:D3:9C" | bluetoothctl
+	sleep 5
+	pactl set-card-profile bluez_card.E4_22_A5_3D_D3_9C off
+	sleep 1
+	pactl set-card-profile bluez_card.E4_22_A5_3D_D3_9C a2dp_sink
+	FIXED=$?
+done
+notify-send "Headset connected successfully"

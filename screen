@@ -1,0 +1,12 @@
+#!/bin/bash
+
+res=$(xrandr | grep ' connected' | wc -l)
+
+if [ "$$res" == "1" ]; then
+	xrandr --auto
+else
+	xrandr --output HDMI1 --primary --auto --pos 0x0 --output eDP1 --off
+	# sleep 2
+	# xrandr --output HDMI1 --primary --auto --pos 0x0 --output eDP1 --auto --pos 1920x1080
+fi
+

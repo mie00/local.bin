@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+case $1 in
+up)
+	VOLUME='3%+'
+	;;
+down)
+	VOLUME='1%-'
+	;;
+*)
+	echo "Usage $0 (up|down)"
+	exit 1
+esac
+
+export VOLUME
+
+vol=$(amixer -D pulse sset Master "$VOLUME" | grep -o '\[[0-9]\+%\]' | grep -o '[0-9]\+' | head -n 1)
+notify-send $(printf "%-${vol}s" "#" | sed "s/ /#/g;s/##/#/g")
