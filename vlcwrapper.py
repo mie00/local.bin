@@ -71,6 +71,7 @@ class Played(object):
         fpath = self.fpath
         curr = None
         pos = None
+        fname = None
         if os.path.isfile(self.cache):
             with open(self.cache) as f:
                 curr = f.readline().strip()
