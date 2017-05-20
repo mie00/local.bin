@@ -34,6 +34,7 @@ class MySelectionMenu(SelectionMenu):
 HOME = os.environ['HOME']
 CACHE = '{}/.cache/vlcwrapper'.format(HOME)
 THUMBS = '{}/thumbs'.format(CACHE)
+VIEWER = 'feh'
 
 for d in (CACHE, THUMBS):
     os.makedirs(d, exist_ok=True)
@@ -162,13 +163,16 @@ def choise():
         if x == ord('s') and menu.current_option < len(sitems):
             t = sitems[menu.current_option][4]
             if t:
-                subprocess.call(['pxl', t])
-                menu.clear_screen()
-                os.system('reset')
-                curses.noecho()
-                curses.cbreak()
-                menu.stdscr.keypad(True)
-                menu.draw()
+                if VIEWER == 'pxl':
+                    subprocess.call(['pxl', t])
+                    menu.clear_screen()
+                    os.system('reset')
+                    curses.noecho()
+                    curses.cbreak()
+                    menu.stdscr.keypad(True)
+                    menu.draw()
+                elif VIEWER == 'feh':
+                    subprocess.call(['feh', t])
         if x == ord('q'):
             menu.go_to(len(sitems))
             menu.select()
