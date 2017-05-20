@@ -50,7 +50,7 @@ class Played(object):
             while self.running:
                 f.seek(0)
                 metadata = self.get_metadata()
-                if metadata[0]:
+                if metadata[0] or metadata[2]:
                     f.write('\n'.join(metadata+['']))
                 for i in range(8):
                     if not self.running:
@@ -74,6 +74,7 @@ class Played(object):
             with open(self.cache) as f:
                 curr = f.readline().strip()
                 pos = f.readline().strip()
+                fname = f.readline().strip()
         argv = sys.argv
         try:
             self.vlc = subprocess.Popen(['vlc', self.fpath])
@@ -86,9 +87,9 @@ class Played(object):
                     break
                 except subprocess.CalledProcessError:
                     sleep(0.5)
-            if curr:
+            if fname:
                 sleep(1)
-                while subprocess.check_output(['playerctl', 'metadata', 'xesam:title']).decode() != curr:
+                while subprocess.check_output(['playerctl', 'metadata', 'xesam:url']).decode() != fname:
                     subprocess.check_call(['playerctl', 'next'])
                     sleep(0.1)
                 subprocess.check_call(['playerctl', 'position', str(float(pos) - 5)])
@@ -126,9 +127,15 @@ def choise():
         with open(f) as ff:
             curr = ff.readline().strip('\n')
             pos = ff.readline().strip('\n')
-            t = '{}:{:02d}'.format(int(float(pos)//60), int(float(pos)%60))
+            if pos:
+                t = '{}:{:02d}'.format(int(float(pos)//60), int(float(pos)%60))
+            else:
+                t = '0:00'
             fname = ff.readline().strip('\n')
-        if curr:
+            fname = fname[len('file://'):] if fname.startswith('file://') else fname
+            fname = urllib.parse.unquote(fname)
+            curr = curr if curr else fname.split('/')[-1]
+        if fname:
             thumbpre = name + '!'
             thumbname = '{}!{}{}.png'.format(thumbpre, curr, pos)
             found = False
@@ -140,8 +147,6 @@ def choise():
                         os.remove(os.path.join(THUMBS, thumb))
                     break
             if found == False:
-                fname = fname[len('file://'):] if fname.startswith('file://') else fname
-                fname = urllib.parse.unquote(fname)
                 c = subprocess.call(['ffmpeg', '-ss' , t, '-i', fname , '-vf', 'scale=320:-1', '-q:v', '4', '-vframes', '1', os.path.join(THUMBS, thumbname)])
                 if c == 0:
                     found = True
