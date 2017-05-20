@@ -29,6 +29,12 @@ class MySelectionMenu(SelectionMenu):
             if self.cb:
                 self.cb(self, ui)
 
+    def remove_item(self, i):
+        self.items.pop(i)
+        if self.screen:
+            self.clear_screen()
+            self.draw()
+
 
 
 HOME = os.environ['HOME']
@@ -57,7 +63,6 @@ class Played(object):
                     if not self.running:
                         break
                     sleep(0.25)
-
 
     def get_metadata(self):
         try:
@@ -160,6 +165,7 @@ def choise():
     sitems = list(reversed(sorted(elems)))
     for _, j, k, l, _ in sitems:
         files.append('{} {} |{}'.format(k, l, j))
+    lastchar = [None]
     def image(menu, x):
         if x == ord('s') and menu.current_option < len(sitems):
             t = sitems[menu.current_option][4]
@@ -174,9 +180,15 @@ def choise():
                     menu.draw()
                 elif VIEWER == 'feh':
                     subprocess.call(['feh', t])
-        if x == ord('q'):
+        elif lastchar[0] == 'd' and x == ord('y'):
+            os.remove(os.path.join(CACHE, sitems[menu.current_option][1].replace('/', '!')))
+            os.remove(sitems[menu.current_option][4])
+            sitems.pop(menu.current_option)
+            menu.remove_item(menu.current_option)
+        elif x == ord('q'):
             menu.go_to(len(sitems))
             menu.select()
+        lastchar[0] = chr(x)
     menu = MySelectionMenu(files, title='Recently Played', cb=image)
     menu.show()
     s = menu.selected_option
