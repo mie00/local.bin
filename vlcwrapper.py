@@ -35,6 +35,9 @@ HOME = os.environ['HOME']
 CACHE = '{}/.cache/vlcwrapper'.format(HOME)
 THUMBS = '{}/thumbs'.format(CACHE)
 
+for d in (CACHE, THUMBS):
+    os.makedirs(d, exist_ok=True)
+
 class Played(object):
     def __init__(self, fpath):
         self.fpath = fpath
